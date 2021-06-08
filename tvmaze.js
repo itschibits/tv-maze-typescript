@@ -12792,10 +12792,13 @@ function getShowsByTerm(term) {
                 case 1:
                     response = _a.sent();
                     console.log("what is response??-->", response.data);
-                    results = response.data.map(function (show) { return ({ id: show.show.id,
-                        name: show.show.name,
-                        summary: show.show.summary,
-                        image: show.show.image.medium }); });
+                    results = response.data.map(function (show) {
+                        var _a;
+                        return ({ id: show.show.id,
+                            name: show.show.name,
+                            summary: show.show.summary,
+                            image: ((_a = show.show.image) === null || _a === void 0 ? void 0 : _a.medium) || DEFAULT_IMAGE });
+                    });
                     console.log("what are the results--->", results);
                     return [2 /*return*/, results];
             }
@@ -12872,10 +12875,28 @@ function getEpisodesOfShow(id) {
 function populateEpisodes(episodes) {
     for (var _i = 0, episodes_1 = episodes; _i < episodes_1.length; _i++) {
         var episode = episodes_1[_i];
-        var $episode = $("<div data-show-id=\"" + episode.id + "\" class=\"Show col-md-12 col-lg-6 mb-4\">\n         <div class=\"media\">\n           <div class=\"media-body\">\n             <h5 class=\"text-primary\">" + episode.name + "</h5>\n             <div><small>" + episode.season + "</small></div>\n             <div><small>" + episode.number + "</small></div>\n           </div>\n         </div>\n       </div>\n      ");
-        $showsList.append($episode);
+        var $episode = $("<li>" + episode.name + " (season " + episode.season + ", number " + episode.number + ")</li>");
+        $episodesArea.append($episode);
     }
+    $episodesArea.show();
 }
+function searchForEpisodesAndDisplay(evt) {
+    return __awaiter(this, void 0, void 0, function () {
+        var showId, episodes;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    showId = $(evt.target).closest('.Show').data('show-id');
+                    return [4 /*yield*/, getEpisodesOfShow(showId)];
+                case 1:
+                    episodes = _a.sent();
+                    populateEpisodes(episodes);
+                    return [2 /*return*/];
+            }
+        });
+    });
+}
+$showsList.on("click", ".Show-getEpisodes", searchForEpisodesAndDisplay);
 
 
 /***/ })

@@ -28,10 +28,9 @@ async function getShowsByTerm(term: string): Promise<Show[]> {
   let results = response.data.map(show  => ({ id: show.show.id, 
                                               name : show.show.name,
                                               summary : show.show.summary,
-                                              image : show.show.image.medium}))
+                                              image : show.show.image?.medium || DEFAULT_IMAGE }))
   console.log("what are the results--->", results)
   return results;
-  
 }
 
 
@@ -104,17 +103,17 @@ function populateEpisodes(episodes) {
 
   for (let episode of episodes) {
     const $episode = $(
-        `<div data-show-id="${episode.id}" class="Show col-md-12 col-lg-6 mb-4">
-         <div class="media">
-           <div class="media-body">
-             <h5 class="text-primary">${episode.name}</h5>
-             <div><small>${episode.season}</small></div>
-             <div><small>${episode.number}</small></div>
-           </div>
-         </div>
-       </div>
-      `);
+        `<li>${episode.name} (season ${episode.season}, number ${episode.number})</li>`);
 
-    $showsList.append($episode);  
+    $episodesArea.append($episode);  
   }
+  $episodesArea.show();
 }
+
+async function searchForEpisodesAndDisplay(evt) {
+  const showId = $(evt.target).closest('.Show').data('show-id');
+  const episodes = await getEpisodesOfShow(showId);
+  populateEpisodes(episodes);
+}
+
+$showsList.on("click", ".Show-getEpisodes", searchForEpisodesAndDisplay);
